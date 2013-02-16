@@ -6,6 +6,12 @@ package solvent.green
  * @author Markus Kahl
  */
 object CSP extends App {
+  /**
+   * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
+   *
+   * @param file CSP file to be loaded.
+   * @return A CSP instance with constraints according to the loaded file.
+   */
   def fromFile(file: java.io.File) = {
     val lines = io.Source.fromFile(file).getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
@@ -46,4 +52,6 @@ object CSP extends App {
  * @param domains Variable domains. Variables are indexed starting with 0.
  * @param constraints Constraints for variables.
  */
-case class CSP(domains: IndexedSeq[Range.Inclusive], constraints: Seq[Constraint])
+case class CSP(domains: IndexedSeq[Range.Inclusive], constraints: Seq[Constraint]) {
+  val vars: Seq[Int] = 0 until domains.size
+}
