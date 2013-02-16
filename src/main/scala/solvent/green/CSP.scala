@@ -1,10 +1,5 @@
 package solvent.green
 
-/**
- * Description goes here.
- *
- * @author Markus Kahl
- */
 object CSP extends App {
   /**
    * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
