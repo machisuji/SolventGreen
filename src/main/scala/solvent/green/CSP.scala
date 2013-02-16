@@ -4,11 +4,11 @@ object CSP extends App {
   /**
    * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
    *
-   * @param file CSP file to be loaded.
+   * @param fileName CSP file to be loaded.
    * @return A CSP instance with constraints according to the loaded file.
    */
-  def fromFile(file: java.io.File) = {
-    val lines = io.Source.fromFile(file).getLines.map(_.trim).filterNot(line =>
+  def fromFile(fileName: String) = {
+    val lines = io.Source.fromFile(fileName).getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
     val numVars = lines.next.toInt
     val domains = Map[Int, Range.Inclusive]((for {
@@ -37,7 +37,8 @@ object CSP extends App {
       Constraint(vars.head, vars.tail, allowed)
     }
 
-    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).toIndexedSeq, constraints.toSeq)
+    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).map(range =>
+      Domain(range.start, range.end)).toIndexedSeq, constraints.toSeq)
   }
 }
 
@@ -47,6 +48,6 @@ object CSP extends App {
  * @param domains Variable domains. Variables are indexed starting with 0.
  * @param constraints Constraints for variables.
  */
-case class CSP(domains: IndexedSeq[Range.Inclusive], constraints: Seq[Constraint]) {
+case class CSP(domains: IndexedSeq[Domain], constraints: Seq[Constraint]) {
   val vars: Seq[Int] = 0 until domains.size
 }
