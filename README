@@ -1,0 +1,6 @@
+This is a collection of Constraint Satisfaction Problem (CSP) Solvers.
+The library is absolutely randomly called "SolventGreen".
+I haven't even seen Soylent Green, mind you. It's just the first thing that popped into my head.
+Deal with it.
+
+Build with: sbt 0.11.3
