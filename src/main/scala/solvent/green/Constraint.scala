@@ -3,7 +3,9 @@ package solvent.green
 /**
  * Defines allowed values for a given variable.
  *
- * @author Markus Kahl
+ * @param varNum Index of the variable this constraint originates from.
+ * @param constrainedVars Indices of the variables constrained by this variable.
+ * @param allowedValues Allowed values of the constrained variables depending on the value of the source variable.
  */
 case class Constraint(
   val varNum: Int,
