@@ -1,7 +1,7 @@
 package solvent.green
 
 /**
- * Defines allowed values for a given variable.
+ * Defines allowed values for a given variable, i.e. an extensional domain.
  *
  * @param varNum Index of the variable this constraint originates from.
  * @param constrainedVars Indices of the variables constrained by this variable.
@@ -10,7 +10,7 @@ package solvent.green
 case class Constraint(
   val varNum: Int,
   val constrainedVars: Seq[Int],
-  val allowedValues: IndexedSeq[Iterable[(Int, Seq[Int])]]
+  val allowedValues: Map[Int, Iterable[(Int, Seq[Int])]]
 ) {
   /**
    * Check allowed variable values given a value for the variable this constraint originates from.

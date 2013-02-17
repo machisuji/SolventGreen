@@ -4,11 +4,11 @@ object CSP extends App {
   /**
    * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
    *
-   * @param fileName CSP file to be loaded.
+   * @param source Source of CSP file to be loaded.
    * @return A CSP instance with constraints according to the loaded file.
    */
-  def fromFile(fileName: String) = {
-    val lines = io.Source.fromFile(fileName).getLines.map(_.trim).filterNot(line =>
+  def fromSource(source: io.Source) = {
+    val lines = source.getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
     val numVars = lines.next.toInt
     val domains = Map[Int, Range.Inclusive]((for {
@@ -30,16 +30,17 @@ object CSP extends App {
           val allowed = allowedByColumn.groupBy(_._2).map { case (col: Int, tuples: Seq[(Int, Int)]) =>
             vars(col) -> tuples.map(_._1).toList
           }
-          value -> allowed.toIterable
+          value -> allowed.toSeq
         }
-      val allowed = values.toIterable.toSeq.sortBy(_._1).map(_._2).toIndexedSeq
 
-      Constraint(vars.head, vars.tail, allowed)
+      Constraint(vars.head, vars.tail, values)
     }
 
     CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).map(range =>
       Domain(range.start, range.end)).toIndexedSeq, constraints.toSeq)
   }
+
+  def fromFile(fileName: String) = fromSource(io.Source.fromFile(fileName))
 }
 
 /**
