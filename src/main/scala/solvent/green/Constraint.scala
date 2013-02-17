@@ -20,4 +20,14 @@ case class Constraint(
    * @see varNum
    */
   def allowedFor(value: Int): Iterable[(Int, Seq[Int])] = allowedValues(value)
+  def domainsFor(value: Int): Iterable[(Int, Domain)] = allowedFor(value).map(e => e._1 -> Domain(e._2))
+
+  override def toString = {
+    def displayAllowed = allowedValues.map { case (value, allowed: Iterable[(Int, Seq[Int])]) =>
+      def displayValues(entry: (Int, Seq[Int])) =
+        s"${entry._1} -> [${entry._2.mkString(", ")}]"
+      s"$value => {${allowed.map(displayValues).mkString(", ")}}"
+    }
+    s"Constraint($varNum -> [${constrainedVars.mkString(", ")}], allowedFor: ${displayAllowed.mkString(", ")}})"
+  }
 }

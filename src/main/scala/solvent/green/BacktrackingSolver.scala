@@ -1,6 +1,6 @@
 package solvent.green
 
-case object BacktrackingSolver extends LoggingSolver {
+trait BacktrackingSolver extends LoggingSolver {
 
   def solveAndLog(csp: CSP, log: (Solution) => Unit) = solve(IndexedSeq(), csp, log)
 
@@ -14,3 +14,5 @@ case object BacktrackingSolver extends LoggingSolver {
     else None
   }
 }
+
+case object BacktrackingSolver extends BacktrackingSolver
