@@ -14,27 +14,8 @@ case class LargeDomain(lowerBound: Int, upperBound: Int) extends Domain {
 
   val ranges: Seq[Range.Inclusive] = Seq(lowerBound to upperBound)
 
-  class Iterator extends collection.Iterator[Int] {
-    var outerIndex = 0
-    var innerIndex = 0
-
-    def hasNext = withinInner || withinOuter
-    def next() = {
-      if (!withinInner) {
-        innerIndex = 0
-        outerIndex += 1
-      }
-      if (withinOuter) currentRange(innerIndex)
-      else throw new NoSuchElementException("There's no next element available.")
-    }
-
-    def currentRange = ranges(outerIndex)
-    def withinInner = ranges(outerIndex).end > ranges(outerIndex)(innerIndex)
-    def withinOuter = outerIndex < ranges.size
-  }
-
   def contains(value: Int) = ranges.exists(_ contains value)
-  def iterator = new Iterator
+  def iterator = ranges.map(_.toIterator).reduce(_ ++ _)
 
   override def toString = "LargeDomain(" + ranges.map(r => s"[${r.start}..${r.end}]").mkString(", ") + ")"
 }
