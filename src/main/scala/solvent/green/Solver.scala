@@ -42,9 +42,11 @@ trait Solver {
    */
   def checkConstraints(solution: Solution, csp: CSP) =
     csp.constraints.filter(con =>
-      (con.varNum +: con.constrainedVars).forall(solution.size >)).forall(con =>
-        con.allowedFor(solution(con.varNum)).forall{ case (col, values) =>
-          values contains solution(col) })
+      (con.varNum +: con.constrainedVars).forall(solution.size >)).forall { con =>
+        val allowed = con.allowedFor(solution(con.varNum))
+        allowed.nonEmpty && allowed.forall{ case (col, values) =>
+          values contains solution(col) }
+      }
 }
 
 /**

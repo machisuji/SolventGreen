@@ -19,7 +19,7 @@ case class Constraint(
    * @return A number of tuples mapping from variable number to a sequence of allowed values.
    * @see varNum
    */
-  def allowedFor(value: Int): Iterable[(Int, Seq[Int])] = allowedValues(value)
+  def allowedFor(value: Int): Iterable[(Int, Seq[Int])] = allowedValues.getOrElse(value, Iterable())
   def domainsFor(value: Int): Iterable[(Int, Domain)] = allowedFor(value).map(e => e._1 -> Domain(e._2))
 
   override def toString = {
