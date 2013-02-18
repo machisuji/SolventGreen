@@ -1,6 +1,6 @@
 package solvent.green
 
-trait ForwardCheckingSolver extends LoggingSolver {
+trait ForwardCheckingDwaySolver extends LoggingSolver {
   def solveAndLog(csp: CSP, log: (Solution) => Unit) = solve(IndexedSeq(), csp, log)
 
   def solve(vars: Solution, csp: CSP, log: (Solution) => Unit): Option[Solution] = {
@@ -15,8 +15,9 @@ trait ForwardCheckingSolver extends LoggingSolver {
 
   def forwardCheck(varNum: Int, varValue: Int, csp: CSP): CSP = {
     val allowed = csp.constraints.filter(_.varNum == varNum).map(_.allowedFor(varValue)).flatten
-    val constrainedDomains = allowed.groupBy(_._1).map(e =>
-      e._1 -> Domain(csp.domains(e._1).toSeq intersect e._2.map(_._2).reduce(_ intersect _)))
+    val constrainedDomains = allowed.groupBy(_._1).map { case (col, allowedFor) =>
+      col -> Domain(csp.domains(col).toSeq intersect allowedFor.map(_._2).reduce(_ intersect _))
+    }
     val revisedDomains = (0 until csp.domains.size).map(i =>
       constrainedDomains.getOrElse(i, csp.domains(i)))
 
@@ -24,4 +25,4 @@ trait ForwardCheckingSolver extends LoggingSolver {
   }
 }
 
-case object ForwardCheckingSolver extends ForwardCheckingSolver
+case object ForwardCheckingDwaySolver extends ForwardCheckingDwaySolver

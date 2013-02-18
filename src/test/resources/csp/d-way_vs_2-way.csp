@@ -1,0 +1,22 @@
+// A CSP in which 2-way branching beats d-way branching performance-wise
+
+// number of variables:
+3
+
+// Domains of the variables (inclusive):
+1, 50
+1, 1
+1, 1
+
+// constraints
+
+// x1 = x2
+c(0, 1)
+1, 1
+
+// x2 != x3
+c(1, 2)
+
+// x1 = x3
+c(0, 2)
+1, 1

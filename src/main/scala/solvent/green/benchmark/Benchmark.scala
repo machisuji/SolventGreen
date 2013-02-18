@@ -25,18 +25,18 @@ object Benchmark extends App with Sugar {
   val problems: Seq[CSP] = problemNames.take(number).map(name =>
     CSP fromFile s"src/test/resources/csp/$name.csp")
   val solvers: Seq[LoggingSolver] = List(
-    BacktrackingSolver, ForwardCheckingSolver)
+    BacktrackingDwaySolver, ForwardCheckingDwaySolver)
 
   problems.zipWithIndex.foreach { case (problem, i) =>
     println("\n'" + problemNames(i) + "':")
     printf("%21s | %10s | %10s | %s\n", "Solver", "Nodes", "MS", "Result")
     solvers.foreach { solver =>
       val (result, nodes, ns) = 2.times.map(_ => solver solutionAndInfo problem).last
-
+      def name = solver.getClass.getSimpleName.replace("Solver$", "")
       if (ns / 1000000 == 0) {
-        printf("%21s | %10d | %10.2f | %s\n", solver, nodes, ns / 1000000d, result)
+        printf("%21s | %10d | %10.2f | %s\n", name, nodes, ns / 1000000d, result)
       } else {
-        printf("%21s | %10d | %10d | %s\n", solver, nodes, ns / 1000000, result)
+        printf("%21s | %10d | %10d | %s\n", name, nodes, ns / 1000000, result)
       }
     }
   }

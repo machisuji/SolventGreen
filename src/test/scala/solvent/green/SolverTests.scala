@@ -6,7 +6,7 @@ import OptionValues.convertOptionToValuable
 
 class SolverTests extends FunSpec with ShouldMatchers {
 
-  val solvers = Seq(BacktrackingSolver, ForwardCheckingSolver)
+  val solvers = Seq(BacktrackingDwaySolver, ForwardCheckingDwaySolver)
   val problems = Map(
     "4Queens"       -> List(1, 3, 0, 2),
     "4crystalMaze"  -> List(3, 5, 7, 1, 8, 2, 4, 6),
@@ -23,6 +23,17 @@ class SolverTests extends FunSpec with ShouldMatchers {
           sol.value.toList should equal (solution)
         }
       }
+    }
+  }
+
+  describe("2-way branching solver") {
+    it("should save work when compared to d-way branching") {
+      val solver: LoggingSolver = ForwardChecking2waySolver
+      val problem = CSP fromFile "src/test/resources/csp/d-way_vs_2-way.csp"
+      val (sol, nodes, _) = solver solutionAndInfo problem
+
+      sol should not be ('defined)
+      nodes should be < (100)
     }
   }
 }

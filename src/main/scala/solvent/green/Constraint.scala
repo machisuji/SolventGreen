@@ -5,12 +5,12 @@ package solvent.green
  *
  * @param varNum Index of the variable this constraint originates from.
  * @param constrainedVars Indices of the variables constrained by this variable.
- * @param allowedValues Allowed values of the constrained variables depending on the value of the source variable.
+ * @param allowedValueMap Allowed values of the constrained variables depending on the value of the source variable.
  */
 case class Constraint(
   val varNum: Int,
   val constrainedVars: Seq[Int],
-  val allowedValues: Map[Int, Iterable[(Int, Seq[Int])]]
+  val allowedValueMap: Map[Int, Iterable[(Int, Seq[Int])]]
 ) {
   /**
    * Check allowed variable values given a value for the variable this constraint originates from.
@@ -19,11 +19,13 @@ case class Constraint(
    * @return A number of tuples mapping from variable number to a sequence of allowed values.
    * @see varNum
    */
-  def allowedFor(value: Int): Iterable[(Int, Seq[Int])] = allowedValues.getOrElse(value, Iterable())
+  def allowedFor(value: Int): Iterable[(Int, Seq[Int])] = allowedValueMap.getOrElse(value, Iterable())
   def domainsFor(value: Int): Iterable[(Int, Domain)] = allowedFor(value).map(e => e._1 -> Domain(e._2))
 
+  def values = allowedValueMap.keys
+
   override def toString = {
-    def displayAllowed = allowedValues.map { case (value, allowed: Iterable[(Int, Seq[Int])]) =>
+    def displayAllowed = allowedValueMap.map { case (value, allowed: Iterable[(Int, Seq[Int])]) =>
       def displayValues(entry: (Int, Seq[Int])) =
         s"${entry._1} -> [${entry._2.mkString(", ")}]"
       s"$value => {${allowed.map(displayValues).mkString(", ")}}"
