@@ -8,7 +8,7 @@ trait ForwardChecking2waySolver extends LoggingSolver with ForwardChecking {
     if (vars.size < csp.vars.size && !csp.domains.exists(_.isEmpty) && checkConstraints(vars, csp)) {
       val x = csp.domains(vars.size).head
 
-      solve(vars :+ x, forwardCheck(vars.size, csp), log).orElse( // <left | x == n> orElse <right | x != n>
+      solve(vars :+ x, forwardCheck(vars.size, csp.assign(vars.size, x)), log).orElse( // <left | x == n> orElse <right | x != n>
         solve(vars, forwardCheck(vars.size, csp.prune(vars.size, x)), log))
     }
     else if (validate(vars, csp)) Some(vars)
