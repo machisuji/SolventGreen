@@ -5,15 +5,11 @@ trait ForwardChecking2waySolver extends LoggingSolver with ForwardChecking {
 
   def solve(vars: Solution, csp: CSP, log: (Solution) => Unit): Option[Solution] = {
     log(vars)
-    if (vars.size < csp.vars.size) {
-      if (!csp.domains.exists(_.isEmpty) && checkConstraints(vars, csp)) {
-        val x = csp.domains(vars.size).head
+    if (vars.size < csp.vars.size && !csp.domains.exists(_.isEmpty) && checkConstraints(vars, csp)) {
+      val x = csp.domains(vars.size).head
 
-        solve(vars :+ x, forwardCheck(vars.size, csp), log).orElse(
-          solve(vars, forwardCheck(vars.size, csp.pruneDomain(vars.size, x)), log))
-      } else {
-        None
-      }
+      solve(vars :+ x, forwardCheck(vars.size, csp), log).orElse( // <left | x == n> orElse <right | x != n>
+        solve(vars, forwardCheck(vars.size, csp.prune(vars.size, x)), log))
     }
     else if (validate(vars, csp)) Some(vars)
     else None
