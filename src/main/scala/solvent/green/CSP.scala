@@ -51,4 +51,10 @@ object CSP {
  */
 case class CSP(domains: IndexedSeq[Domain], constraints: Seq[Constraint]) {
   val vars: Seq[Int] = 0 until domains.size
+
+  def pruneDomain(index: Int, prunedValue: Int) =
+    CSP(domains.patch(index, IndexedSeq(domains(index) - prunedValue), 1), constraints)
+
+  def assign(varNum: Int, value: Int) =
+    CSP(domains.patch(varNum, IndexedSeq(FineDomain(Seq(value))), 1), constraints)
 }

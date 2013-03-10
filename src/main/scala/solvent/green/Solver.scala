@@ -1,5 +1,7 @@
 package solvent.green
 
+import language.postfixOps
+
 /**
  * A CSP (Constraint Satisfaction Problem) Solver
  */
