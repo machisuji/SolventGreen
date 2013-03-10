@@ -17,7 +17,7 @@ object Benchmark extends App with Sugar {
   }
 
   val problemNames: Seq[String] = Stream(
-    "3Langford", "4crystalMaze", "6crystalMaze", "4Queens", "11Queens", "25Queens")
+    "d-way_vs_2-way", "3Langford", "4crystalMaze", "6crystalMaze", "4Queens", "11Queens", "25Queens")
 
   val number = args.find(arg => arg == "-q" || arg == "--quick").map(_ =>
     problemNames.size - 1).getOrElse(problemNames.size)
@@ -25,7 +25,7 @@ object Benchmark extends App with Sugar {
   val problems: Seq[CSP] = problemNames.take(number).map(name =>
     CSP fromFile s"src/test/resources/csp/$name.csp")
   val solvers: Seq[LoggingSolver] = List(
-    BacktrackingDwaySolver, ForwardCheckingDwaySolver)
+    BacktrackingDwaySolver, ForwardCheckingDwaySolver, ForwardChecking2waySolver)
 
   problems.zipWithIndex.foreach { case (problem, i) =>
     println("\n'" + problemNames(i) + "':")
