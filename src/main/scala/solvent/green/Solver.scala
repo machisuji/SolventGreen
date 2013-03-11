@@ -63,9 +63,9 @@ trait LoggingSolver extends Solver {
    * @param log Log function called with every intermediate solution.
    * @return Some(Solution) if a valid solution could be found or None if no solution could be found.
    */
-  def solveAndLog(csp: CSP, log: (Solution) => Unit): Option[Solution]
+  def solveAndLog(csp: CSP, log: (Solution, CSP) => Unit): Option[Solution]
 
-  def solve(csp: CSP) = solveAndLog(csp, _ => ())
+  def solve(csp: CSP) = solveAndLog(csp, (_, _) => ())
 
   /**
    * Tries to solve the given CSP while also logging the number of explored search nodes
@@ -77,7 +77,7 @@ trait LoggingSolver extends Solver {
    */
   def solutionAndInfo(csp: CSP, show: Boolean = false) = {
     var calls: Int = 0
-    def log(sol: Solution) {
+    def log(sol: Solution, csp: CSP) {
       if (show) {
         println(sol)
       }
