@@ -6,7 +6,8 @@ import OptionValues.convertOptionToValuable
 
 class SolverTests extends FunSpec with ShouldMatchers {
 
-  val solvers = Seq(BacktrackingDwaySolver, ForwardCheckingDwaySolver, ForwardChecking2waySolver)
+  val solvers = Seq(
+    BacktrackingDwaySolver, Backtracking2waySolver, ForwardCheckingDwaySolver, ForwardChecking2waySolver)
   val problems = Map(
     "4Queens"       -> List(1, 3, 0, 2),
     "4crystalMaze"  -> List(3, 5, 7, 1, 8, 2, 4, 6),

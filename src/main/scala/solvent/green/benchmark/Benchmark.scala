@@ -25,7 +25,7 @@ object Benchmark extends App with Sugar {
   val problems: Seq[CSP] = problemNames.take(number).map(name =>
     CSP fromFile s"src/test/resources/csp/$name.csp")
   val solvers: Seq[LoggingSolver] = List(
-    BacktrackingDwaySolver, ForwardCheckingDwaySolver, ForwardChecking2waySolver)
+    BacktrackingDwaySolver, Backtracking2waySolver, ForwardCheckingDwaySolver, ForwardChecking2waySolver)
 
   problems.zipWithIndex.foreach { case (problem, i) =>
     println("\n'" + problemNames(i) + "':")
