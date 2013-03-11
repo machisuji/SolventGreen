@@ -8,7 +8,7 @@ trait ForwardChecking {
     val constrainedForth = csp.constraints.filter(_.varNum == varNum).flatMap(_.constrainedVars).toSet
     val allAllowedForth = csp.constraints.filter(_.varNum == varNum).map(con =>
       csp.domains(varNum).flatMap(v => con.allowedFor(v))
-    ).flatten.toList.groupBy(_._1).map(e => e._1 -> e._2.map(_._2).reduce(_ ++ _))
+    ).flatten.groupBy(_._1).map(e => e._1 -> e._2.map(_._2).reduce(_ ++ _))
 
     val revisedDomains = csp.domains.zipWithIndex.map { case (domain, i) =>
       if (i == varNum) domain // forward checked var is not pruned
