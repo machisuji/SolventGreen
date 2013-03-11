@@ -11,10 +11,18 @@ object CSP {
     val lines = source.getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
     val numVars = lines.next.toInt
-    val domains = Map[Int, Range.Inclusive]((for {
+    val domains = Map[Int, Domain]((for {
       i <- 0 until numVars
-      Array(start, end) = lines.next.split(",\\s*").map(_.toInt)
-    } yield i -> (start to end)): _*)
+      line = lines.next
+    } yield
+      if (line startsWith "Set(") {
+        val values = line.replace("Set(", "").replace(")", "").trim.split(",\\s*").map(_.toInt)
+        i -> FineDomain(values)
+      } else {
+        val Array(start, end) = line.split(",\\s*").map(_.toInt)
+        i -> Domain(start, end)
+      }
+    ): _*)
 
     var c: Option[String] = None
     val constraints = lines.map { line =>
@@ -36,8 +44,7 @@ object CSP {
       Constraint(vars.head, vars.tail, values)
     }
 
-    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).map(range =>
-      Domain(range.start, range.end)).toIndexedSeq, constraints.toSeq)
+    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).toIndexedSeq, constraints.toSeq)
   }
 
   def fromFile(fileName: String) = fromSource(io.Source.fromFile(fileName))
