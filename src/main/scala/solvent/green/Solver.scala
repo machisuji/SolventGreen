@@ -6,13 +6,15 @@ import language.postfixOps
  * A CSP (Constraint Satisfaction Problem) Solver
  */
 trait Solver {
+  def solve(csp: CSP): Option[Solution] = solve(Solution.empty, csp)
   /**
    * Tries to solve a CSP.
    *
+   * @param sol The intermediate solution to start off.
    * @param csp The problem to be solved.
    * @return Some(Solution) if a valid solution could be found or None if no solution could be found.
    */
-  def solve(csp: CSP): Option[Solution]
+  def solve(sol: Solution, csp: CSP): Option[Solution]
 
   /**
    * Validates that a solution is applicable to a given problem and that it satisfies all constraints.
@@ -48,10 +50,16 @@ trait Solver {
       }
 }
 
+import util.DynamicVariable
+
 /**
- * A CSP Solver that provides the ability to log every intermediate solution (search node).
+ * Enhances a CSP Solver with the ability to log every intermediate solution (search node).
  */
-trait LoggingSolver extends Solver {
+trait Logging extends Solver {
+
+  private val log: DynamicVariable[(Solution, CSP) => Unit] =
+    new DynamicVariable((_: Solution, _: CSP) => ())
+
   /**
    * Tries to solve a given CSP while reporting every intermediate solution on the search path
    * through a given log function.
@@ -60,9 +68,13 @@ trait LoggingSolver extends Solver {
    * @param log Log function called with every intermediate solution.
    * @return Some(Solution) if a valid solution could be found or None if no solution could be found.
    */
-  def solveAndLog(csp: CSP, log: (Solution, CSP) => Unit): Option[Solution]
+  def solveAndLog(csp: CSP, log: (Solution, CSP) => Unit): Option[Solution] =
+    this.log.withValue(log)(solve(csp))
 
-  def solve(csp: CSP) = solveAndLog(csp, (_, _) => ())
+  abstract override def solve(sol: Solution, csp: CSP): Option[Solution] = {
+    log.value(sol, csp)
+    super.solve(sol, csp)
+  }
 
   /**
    * Tries to solve the given CSP while also logging the number of explored search nodes
