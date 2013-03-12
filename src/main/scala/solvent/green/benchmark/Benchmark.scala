@@ -29,14 +29,25 @@ object Benchmark extends App with Sugar {
 
   problems.zipWithIndex.foreach { case (problem, i) =>
     println("\n'" + problemNames(i) + "':")
-    printf("%21s | %10s | %10s | %s\n", "Solver", "Nodes", "MS", "Result")
+    printf("%21s | %16s | %10s | %10s | %s\n", "Solver", "Var. Order", "Nodes", "MS", "Result")
     solvers.foreach { solver =>
-      val (result, nodes, ns) = 2.times.map(_ => solver solutionAndInfo problem).last
-      def name = solver.getClass.getSimpleName.replace("Solver$", "")
-      if (ns / 1000000 == 0) {
-        printf("%21s | %10d | %10.2f | %s\n", name, nodes, ns / 1000000d, result)
-      } else {
-        printf("%21s | %10d | %10d | %s\n", name, nodes, ns / 1000000, result)
+      val orders = Seq(DefaultVarOrder, ReverseVarOrder, SmallestDomainVarOrder)
+
+      orders.foreach { order =>
+        val (result, nodes, ns) = 2.times.map(_ => solver solutionAndInfo problem.copy(varOrder = order)).last
+        def name = solver.getClass.getSimpleName.replace("Solver$", "")
+        def orderName = order.getClass.getSimpleName.replace("VarOrder", "").replace("$", "")
+        def normalise(result: Seq[Int]) = // to make comparing results easier
+          if (order == ReverseVarOrder) result.reverse
+          else result
+
+        if (ns / 1000000 == 0) {
+          printf("%21s | %16s | %10d | %10.2f | %s\n",
+            name, orderName, nodes, ns / 1000000d, result.map(_.toOrderedSeq).map(normalise))
+        } else {
+          printf("%21s | %16s | %10d | %10d | %s\n",
+            name, orderName, nodes, ns / 1000000, result.map(_.toOrderedSeq).map(normalise))
+        }
       }
     }
   }
