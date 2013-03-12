@@ -17,7 +17,7 @@ object Benchmark extends App with Sugar {
   }
 
   val problemNames: Seq[String] = Stream(
-    "d-way_vs_2-way", "3Langford", "4crystalMaze", "6crystalMaze", "4Queens", "11Queens", "25Queens")
+    "d-way_vs_2-way", "var-order", "3Langford", "4crystalMaze", "6crystalMaze", "4Queens", "11Queens", "25Queens")
 
   val number = args.find(arg => arg == "-q" || arg == "--quick").map(_ =>
     problemNames.size - 1).getOrElse(problemNames.size)
@@ -37,16 +37,13 @@ object Benchmark extends App with Sugar {
         val (result, nodes, ns) = 2.times.map(_ => solver solutionAndInfo problem.copy(varOrder = order)).last
         def name = solver.getClass.getSimpleName.replace("Solver$", "")
         def orderName = order.getClass.getSimpleName.replace("VarOrder", "").replace("$", "")
-        def normalise(result: Seq[Int]) = // to make comparing results easier
-          if (order == ReverseVarOrder) result.reverse
-          else result
 
         if (ns / 1000000 == 0) {
           printf("%21s | %16s | %10d | %10.2f | %s\n",
-            name, orderName, nodes, ns / 1000000d, result.map(_.toOrderedSeq).map(normalise))
+            name, orderName, nodes, ns / 1000000d, result.map(_.toOrderedSeq))
         } else {
           printf("%21s | %16s | %10d | %10d | %s\n",
-            name, orderName, nodes, ns / 1000000, result.map(_.toOrderedSeq).map(normalise))
+            name, orderName, nodes, ns / 1000000, result.map(_.toOrderedSeq))
         }
       }
     }
