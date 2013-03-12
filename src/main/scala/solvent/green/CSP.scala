@@ -109,7 +109,7 @@ case object ReverseVarOrder extends VariableAssignmentOrder {
 
 case object SmallestDomainVarOrder extends VariableAssignmentOrder {
   def next(sol: Solution, csp: CSP): Int =
-    csp.vars.zip(csp.domains).filter {
+    csp.vars.zip(csp.domains).filterNot {
       case (i, domain) => sol.contains(i)
     }.sortBy {
       case (i, domain) => domain.size
