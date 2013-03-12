@@ -86,6 +86,9 @@ case class CSP(
   constraints: Seq[Constraint],
   varOrder: VariableAssignmentOrder = DefaultVarOrder
 ) {
+  /**
+   * indices for this CSP's variables and their domains.
+   */
   val vars: Seq[Int] = 0 until domains.size
 
   /**
