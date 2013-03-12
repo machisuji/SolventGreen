@@ -6,9 +6,6 @@ import language.postfixOps
  * A CSP (Constraint Satisfaction Problem) Solver
  */
 trait Solver {
-
-  type Solution = IndexedSeq[Int]
-
   /**
    * Tries to solve a CSP.
    *
@@ -28,7 +25,7 @@ trait Solver {
    */
   def validate(solution: Solution, csp: CSP) =
     solution.size == csp.vars.size &&
-    solution.zip(csp.domains).forall { case (value, domain) => domain contains value } &&
+    solution.toOrderedSeq.zip(csp.domains).forall { case (value, domain) => domain contains value } &&
     checkConstraints(solution, csp)
 
   /**
@@ -44,7 +41,7 @@ trait Solver {
    */
   def checkConstraints(solution: Solution, csp: CSP) =
     csp.constraints.filter(con =>
-      (con.varNum +: con.constrainedVars).forall(solution.size >)).forall { con =>
+      (con.varNum +: con.constrainedVars).forall(solution.contains)).forall { con =>
         val allowed = con.allowedFor(solution(con.varNum))
         allowed.nonEmpty && allowed.forall{ case (col, values) =>
           values contains solution(col) }

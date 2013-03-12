@@ -56,12 +56,64 @@ object CSP {
  * @param domains Variable domains. Variables are indexed starting with 0.
  * @param constraints Constraints for variables.
  */
-case class CSP(domains: IndexedSeq[Domain], constraints: Seq[Constraint]) {
+case class CSP(
+  domains: IndexedSeq[Domain],
+  constraints: Seq[Constraint],
+  varOrder: VariableAssignmentOrder = DefaultVarOrder
+) {
   val vars: Seq[Int] = 0 until domains.size
 
+  def selectNext(sol: Solution) = {
+    val i = varOrder.next(sol, this)
+    i -> domains(i).head
+  }
+
+  def selectAllNext(sol: Solution) = {
+    val i = varOrder.next(sol, this)
+    domains(i).toIterator.map(value => i -> value)
+  }
+
+  def staticVarOrder(xs: Seq[Int]) = this.copy(varOrder = StaticVarOrder(xs))
+  def reverseVarOrder = this.copy(varOrder = ReverseVarOrder)
+  def smallestDomainVarOrder = this.copy(varOrder = SmallestDomainVarOrder)
+
   def prune(varNum: Int, value: Int) =
-    CSP(domains.patch(varNum, IndexedSeq(domains(varNum) - value), 1), constraints)
+    CSP(domains.patch(varNum, IndexedSeq(domains(varNum) - value), 1), constraints, varOrder)
 
   def assign(varNum: Int, value: Int) =
-    CSP(domains.patch(varNum, IndexedSeq(FineDomain(Seq(value))), 1), constraints)
+    CSP(domains.patch(varNum, IndexedSeq(FineDomain(Seq(value))), 1), constraints, varOrder)
+}
+
+trait VariableAssignmentOrder {
+  /**
+   * Picks the next to-be-assigned variable depending on the given intermediate solution.
+   *
+   * @param sol The solution containing the currently assigned variables.
+   * @param csp The problem to be solved.
+   * @return The number (index) of the next variable (domain) to get values for (from).
+   */
+  def next(sol: Solution, csp: CSP): Int
+}
+
+case object DefaultVarOrder extends VariableAssignmentOrder {
+  def next(sol: Solution, csp: CSP): Int = csp.vars(sol.size)
+}
+
+case class StaticVarOrder(xs: Seq[Int]) extends VariableAssignmentOrder {
+  def next(sol: Solution, csp: CSP): Int = xs(sol.size)
+}
+
+case object ReverseVarOrder extends VariableAssignmentOrder {
+  def next(sol: Solution, csp: CSP): Int = csp.vars.reverse(sol.size)
+}
+
+case object SmallestDomainVarOrder extends VariableAssignmentOrder {
+  def next(sol: Solution, csp: CSP): Int =
+    csp.vars.zip(csp.domains).filter {
+      case (i, domain) => sol.contains(i)
+    }.sortBy {
+      case (i, domain) => domain.size
+    }.headOption.map(_._1).getOrElse {
+      throw new IllegalStateException("Cannot pick next variable. All variables are already assigned.")
+    }
 }

@@ -1,14 +1,14 @@
 package solvent.green
 
 trait ForwardCheckingDwaySolver extends LoggingSolver with ForwardChecking {
-  def solveAndLog(csp: CSP, log: (Solution, CSP) => Unit) = solve(IndexedSeq(), csp, log)
+  def solveAndLog(csp: CSP, log: (Solution, CSP) => Unit) = solve(Solution.empty, csp, log)
 
   def solve(vars: Solution, csp: CSP, log: (Solution, CSP) => Unit): Option[Solution] = {
     log(vars, csp)
     if (vars.size < csp.vars.size && !csp.domains.exists(_.isEmpty) && checkConstraints(vars, csp)) {
-      csp.domains(vars.size).toIterator.map(x =>
-        solve(vars :+ x, forwardCheck(vars.size, csp.assign(vars.size, x)), log))
-      .find(_.isDefined).getOrElse(None)
+      csp.selectAllNext(vars).map { case next @ (i, x) =>
+        solve(vars + next, forwardCheck(i, csp.assign(i, x)), log)
+      }.find(_.isDefined).getOrElse(None)
     }
     else if (validate(vars, csp)) Some(vars)
     else None
