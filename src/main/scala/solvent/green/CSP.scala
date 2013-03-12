@@ -4,7 +4,7 @@ object CSP {
   /**
    * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
    *
-   * The original format is enhanced in two ways.
+   * The original format is enhanced in several ways.
    * Firstly a variable assignment order can be specified following the number of variables.
    * This can be an explicit static order like this:
    *     // number of variables:
@@ -16,6 +16,8 @@ object CSP {
    * Moreover not only ranges but also sets can be given as domains:
    *     // Domains of the variables:
    *     Set(2, 10, 16)
+   *
+   * Lastly constraints of arbitrary arity are supported (as opposed to binary ones only).
    *
    * @param source Source of CSP file to be loaded.
    * @return A CSP instance with constraints according to the loaded Source.

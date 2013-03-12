@@ -1,7 +1,7 @@
 package solvent.green
 
 /**
- * Defines allowed values for a given variable, i.e. an extensional domain.
+ * Defines allowed values for a given variable, i.e. an extensional sub-domain.
  *
  * @param varNum Index of the variable this constraint originates from.
  * @param constrainedVars Indices of the variables constrained by this variable.
