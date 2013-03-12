@@ -11,7 +11,7 @@ object Benchmark extends App with Sugar {
 
   if (args.exists(arg => arg == "-h" || arg == "--help")) {
     println("Options:")
-    println("  -q --quick | do not run expensive benchmarks")
+    println("  -t --tough | run very expensive benchmarks taking hours")
 
     System.exit(0)
   }
@@ -19,8 +19,8 @@ object Benchmark extends App with Sugar {
   val problemNames: Seq[String] = Stream(
     "d-way_vs_2-way", "var-order", "3Langford", "4crystalMaze", "6crystalMaze", "4Queens", "11Queens", "25Queens")
 
-  val number = args.find(arg => arg == "-q" || arg == "--quick").map(_ =>
-    problemNames.size - 1).getOrElse(problemNames.size)
+  val number = args.find(arg => arg == "-t" || arg == "--tough").map(_ =>
+    problemNames.size).getOrElse(problemNames.size - 1)
 
   val problems: Seq[CSP] = problemNames.take(number).map(name =>
     CSP fromFile s"src/test/resources/csp/$name.csp")
