@@ -4,7 +4,7 @@ trait Backtracking2waySolver extends Solver {
   def solve(vars: Solution, csp: CSP): Option[Solution] = {
     if (vars.size < csp.vars.size && !csp.domains.exists(_.isEmpty) && checkConstraints(vars, csp)) {
       val next @ (i, x) = csp.selectNext(vars)
-      solve(vars + next, csp.assign(i, x)) orElse solve(vars, csp.prune(i, x))
+      solve(vars + next, csp.assign(i, x)) orElse solve(vars, csp.prune(i, x)) // left orElse right
     }
     else if (validate(vars, csp)) Some(vars)
     else None

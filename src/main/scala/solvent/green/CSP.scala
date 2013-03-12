@@ -18,7 +18,7 @@ object CSP {
    *     Set(2, 10, 16)
    *
    * @param source Source of CSP file to be loaded.
-   * @return A CSP instance with constraints according to the loaded file.
+   * @return A CSP instance with constraints according to the loaded Source.
    */
   def fromSource(source: io.Source) = {
     val lines = source.getLines.map(_.trim).filterNot(line =>
@@ -127,7 +127,7 @@ case class CSP(
    *
    * @param varNum The index of the variable to be assigned.
    * @param value The value to be assigned to the variable.
-   * @return A new CSP with the assigned the assigned variable's pruned domain.
+   * @return A new CSP with the assigned variable's pruned domain.
    */
   def assign(varNum: Int, value: Int) =
     CSP(domains.patch(varNum, IndexedSeq(FineDomain(Seq(value))), 1), constraints, varOrder)

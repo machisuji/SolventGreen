@@ -64,7 +64,7 @@ object Domain {
   val empty = Domain(Seq())
 }
 
-// the rest of the code here is not important and not relevant for understanding
+// the rest of the code here is not important and not relevant for understanding a solver
 
 case class CoarseDomain(ranges: Seq[Seq[Int]]) extends Domain {
   def lowerBound = ranges.head.head

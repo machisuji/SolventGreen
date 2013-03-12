@@ -18,17 +18,15 @@ trait Solver {
 
   /**
    * Validates that a solution is applicable to a given problem and that it satisfies all constraints.
-   * Note to myself: checking for domains is unnecessary since the constraints are extensional anyway,
-   * but perhaps there will be intensional ones one day.
    *
    * @param solution The candidate solution to be validated.
    * @param csp The problem to the given solution.
    * @return True if the solution is valid, false otherwise.
    */
   def validate(solution: Solution, csp: CSP) =
-    solution.size == csp.vars.size &&
+    solution.size == csp.vars.size && // assignment complete?
     solution.toOrderedSeq.zip(csp.domains).forall { case (value, domain) => domain contains value } &&
-    checkConstraints(solution, csp)
+    checkConstraints(solution, csp) // line above: check that all values lie within their domains
 
   /**
    * Checks all applicable constraints for an intermediate solution.
@@ -42,13 +40,16 @@ trait Solver {
    * @see #validate(Solution, CSP)
    */
   def checkConstraints(solution: Solution, csp: CSP) =
-    csp.constraints.filter(con =>
+    csp.constraints.filter(con => // only consider constraints whose involved vars are assigned so far
       (con.varNum +: con.constrainedVars).forall(solution.contains)).forall { con =>
         val allowed = con.allowedFor(solution(con.varNum))
-        allowed.nonEmpty && allowed.forall{ case (col, values) =>
-          values contains solution(col) }
+        allowed.nonEmpty && allowed.forall { case (col, values) =>
+          values contains solution(col) // assigned value must be allowed by constraint
+        }
       }
 }
+
+// the rest of the code here is not important and not relevant for understanding a solver
 
 import util.DynamicVariable
 
