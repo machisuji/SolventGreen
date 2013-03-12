@@ -77,6 +77,7 @@ object CSP {
  *
  * @param domains Variable domains. Variables are indexed starting with 0.
  * @param constraints Constraints for variables.
+ * @param varOrder Variable assignment order
  */
 case class CSP(
   domains: IndexedSeq[Domain],
@@ -85,11 +86,23 @@ case class CSP(
 ) {
   val vars: Seq[Int] = 0 until domains.size
 
+  /**
+   * Selects the next variable value according to this CSP's variable assignment order.
+   *
+   * @param sol The intermediate solution with the already assigned variables.
+   * @return A tuple of variable index and value.
+   */
   def selectNext(sol: Solution) = {
     val i = varOrder.next(sol, this)
     i -> domains(i).head
   }
 
+  /**
+   * Selects all possible next variable values according to this CSP's variable assignment order.
+   *
+   * @param sol The intermediate solution with the already assigned variables.
+   * @return An iterator of tuples of variable index and value.
+   */
   def selectAllNext(sol: Solution) = {
     val i = varOrder.next(sol, this)
     domains(i).toIterator.map(value => i -> value)
@@ -99,9 +112,23 @@ case class CSP(
   def reverseVarOrder = this.copy(varOrder = ReverseVarOrder)
   def smallestDomainVarOrder = this.copy(varOrder = SmallestDomainVarOrder)
 
+  /**
+   * Prunes a domain by a single value.
+   *
+   * @param varNum The index of the domain to be pruned.
+   * @param value The value to be removed from the domain.
+   * @return A new CSP with the pruned domain.
+   */
   def prune(varNum: Int, value: Int) =
     CSP(domains.patch(varNum, IndexedSeq(domains(varNum) - value), 1), constraints, varOrder)
 
+  /**
+   * Assigns a variable, i.e. removes all other values except the assigned one from the respective domain.
+   *
+   * @param varNum The index of the variable to be assigned.
+   * @param value The value to be assigned to the variable.
+   * @return A new CSP with the assigned the assigned variable's pruned domain.
+   */
   def assign(varNum: Int, value: Int) =
     CSP(domains.patch(varNum, IndexedSeq(FineDomain(Seq(value))), 1), constraints, varOrder)
 }
@@ -132,9 +159,9 @@ case object ReverseVarOrder extends VariableAssignmentOrder {
 case object SmallestDomainVarOrder extends VariableAssignmentOrder {
   def next(sol: Solution, csp: CSP): Int =
     csp.vars.zip(csp.domains).filterNot {
-      case (i, domain) => sol.contains(i)
+      case (i, domain) => sol.contains(i) // only consider not-yet-assigned variables
     }.sortBy {
-      case (i, domain) => domain.size
+      case (i, domain) => domain.size // select smallest domains first
     }.headOption.map(_._1).getOrElse {
       throw new IllegalStateException("Cannot pick next variable. All variables are already assigned.")
     }
