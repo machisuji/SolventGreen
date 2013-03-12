@@ -4,13 +4,35 @@ object CSP {
   /**
    * Reads CSPs in the form of that which can be found under 'src/main/resources/csp/4Queens.csp'.
    *
+   * The original format is enhanced in two ways.
+   * Firstly a variable assignment order can be specified following the number of variables.
+   * This can be an explicit static order like this:
+   *     // number of variables:
+   *     4 (0, 1, 3, 2)
+   * It can also be a dynamic order, specifically smallest domain first:
+   *     // number of variables:
+   *     4 (smallest domain)
+   *
+   * Moreover not only ranges but also sets can be given as domains:
+   *     // Domains of the variables:
+   *     Set(2, 10, 16)
+   *
    * @param source Source of CSP file to be loaded.
    * @return A CSP instance with constraints according to the loaded file.
    */
   def fromSource(source: io.Source) = {
     val lines = source.getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
-    val numVars = lines.next.toInt
+    val (numVars, varOrder) = Some(lines.next).map { line =>
+      if (line.contains(",")) { // static order
+        line.split("\\(").head.trim.toInt ->
+          StaticVarOrder(line.dropWhile(c => c != '(').tail.init.split(",\\s*").map(_.toInt))
+      } else if (line.toLowerCase.contains("smallest") && line.toLowerCase.contains("domain")) {
+        line.split("\\(").head.trim.toInt -> SmallestDomainVarOrder
+      } else {
+        line.toInt -> DefaultVarOrder
+      }
+    }
     val domains = Map[Int, Domain]((for {
       i <- 0 until numVars
       line = lines.next
@@ -44,7 +66,7 @@ object CSP {
       Constraint(vars.head, vars.tail, values)
     }
 
-    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).toIndexedSeq, constraints.toSeq)
+    CSP(domains.toIterable.toSeq.sortBy(_._1).map(_._2).toIndexedSeq, constraints.toSeq, varOrder)
   }
 
   def fromFile(fileName: String) = fromSource(io.Source.fromFile(fileName))
