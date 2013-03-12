@@ -23,7 +23,7 @@ object CSP {
   def fromSource(source: io.Source) = {
     val lines = source.getLines.map(_.trim).filterNot(line =>
       line.startsWith("//") || line.isEmpty)
-    val (numVars, varOrder) = Some(lines.next).map { line =>
+    val Some((numVars, varOrder)) = Some(lines.next).map { line =>
       if (line.contains(",")) { // static order
         line.split("\\(").head.trim.toInt ->
           StaticVarOrder(line.dropWhile(c => c != '(').tail.init.split(",\\s*").map(_.toInt))
