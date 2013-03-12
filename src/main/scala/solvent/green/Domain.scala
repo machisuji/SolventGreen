@@ -10,7 +10,21 @@ trait Domain extends Iterable[Int] {
   def upperBound: Int
 
   def contains(value: Int): Boolean
+
+  /**
+   * Removes all elements satisfying a given predicate from this domain.
+   *
+   * @param p Predicate to select to-be-pruned values.
+   * @return A new Domain without the pruned values.
+   */
   def prune(p: (Int) => Boolean): Domain
+
+  /**
+   * Removes all elements not satisfying a given predicate from this domain.
+   *
+   * @param p Predicate to select values to be kept.
+   * @return A new domain with only the values satisfying the given predicate.
+   */
   def pruneNot(p: (Int) => Boolean): Domain
 
   /**
@@ -21,6 +35,36 @@ trait Domain extends Iterable[Int] {
    */
   def -(x: Int): Domain
 }
+
+object Domain {
+  /**
+   * Creates a new domain based on a given range.
+   *
+   * @param lb The lower bound of the domain's range.
+   * @param ub The upper bound of the domain's range.
+   * @return A domain ranging from lb to ub.
+   */
+  def apply(lb: Int, ub: Int): Domain =
+    if (math.abs(ub - lb) >= 10) CoarseDomain(lb, ub)
+    else FineDomain((lb to ub).toSeq)
+
+  /**
+   * Creates a new domain.
+   *
+   * @param values The exact values for this domain.
+   * @return A domain containing the given values.
+   */
+  def apply(values: Seq[Int]): Domain = FineDomain(values)
+
+  /**
+   * Creates an empty domain.
+   *
+   * @return An empty domain.
+   */
+  val empty = Domain(Seq())
+}
+
+// the rest of the code here is not important and not relevant for understanding
 
 case class CoarseDomain(ranges: Seq[Seq[Int]]) extends Domain {
   def lowerBound = ranges.head.head
@@ -68,14 +112,4 @@ case class FineDomain(values: Seq[Int]) extends Domain {
 
   override def toString = s"f.Domain(${values.mkString(",")})"
   override def toSeq = values
-}
-
-object Domain {
-  def apply(lb: Int, ub: Int): Domain =
-    if (math.abs(ub - lb) >= 10) CoarseDomain(lb, ub)
-    else FineDomain((lb to ub).toSeq)
-
-  def apply(values: Seq[Int]): Domain = FineDomain(values)
-
-  def empty = Domain(Seq())
 }
