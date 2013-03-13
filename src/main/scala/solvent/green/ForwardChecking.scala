@@ -16,7 +16,7 @@ trait ForwardChecking {
 
     // varNums of variables that have constraints pointing to them from variable varNum
     val constrainedForth = csp.constraints.filter(_.varNum == varNum).flatMap(_.constrainedVars).toSet
-    val allAllowedForth = csp.constraints.filter(_.varNum == varNum).map(con => // according allowed values
+    val allAllowedForth = csp.constraints.filter(_.varNum == varNum).map(con => // according to constraints
       csp.domains(varNum).flatMap(v => con.allowedFor(v)) // derive values for each possible value in domain
     ).flatten.groupBy(_._1).map(e => e._1 -> e._2.map(_._2).reduce(_ ++ _)) // consolidate
 
@@ -24,15 +24,15 @@ trait ForwardChecking {
       if (i == varNum) domain // forward checked var is not pruned
       else {
         val allowedBack = allAllowedBack.filter(_._1 == i) // allowed for currently checked variable i
+          .flatMap(_._2).filter(_._1 == varNum).flatMap(_._2) // consolidate
         val allowedForth =
           if (allAllowedForth contains i) FineDomain(allAllowedForth(i)) // constrained, certain values allowed
           else if (constrainedForth contains i) FineDomain(Seq.empty) // constrained, but no values allowed
           else domain // not constrained, hence whole of domain allowed
 
         if (allowedBack.isEmpty && !constrainedForth.contains(i)) domain // no constraints defined for this domain
-        else domain.pruneNot(v =>     // drop all values that cannot be derived from any of the
-          allowedForth.contains(v) || // constraints pointing back/forth to/from variable <varNum>
-            allowedBack.exists(_._2.exists(e => e._1 == varNum && e._2.contains(v))))
+        else domain.pruneNot(v => // drop all values that cannot be derived from any of the constraints
+          allowedForth.contains(v) || allowedBack.contains(v))
       }
     }
 
