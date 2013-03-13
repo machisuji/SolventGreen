@@ -5,20 +5,22 @@ The library is absolutely randomly called "SolventGreen".
 I haven't even seen Soylent Green, mind you. It's just the first thing that popped into my head.
 Deal with it.
 
-## Solving Strategies & Heuristics
+### Solving Strategies & Heuristics
 
 Both *2-way branching* and *d-way branching* strategies are employed.
 For both there is a *backtracking* solver and also a solver using *forward checking*.
 Besides static *variable assignment order* there is also support for *smallest domain first* ordering.
 
-## Building
+### Building
 
 Build with: sbt 0.11.3
 
-## Packaging
+### Packaging
 
-> `sbt assembly`
+`sbt assembly`
 
-## Running the Benchmark
+This will run all tests and if successful package everything (including the scala library) into an executable jar file.
 
-> `java -jar target/solvent-green.jar solvent.green.benchmark.Benchmark`
+### Running the Benchmark
+
+`java -jar target/solvent-green.jar solvent.green.benchmark.Benchmark`
