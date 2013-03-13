@@ -17,13 +17,24 @@ trait Solver {
   def solve(sol: Solution, csp: CSP): Option[Solution]
 
   /**
+   * Validates that an intermediate (incomplete) solution is applicable to a given problem
+   * and satisfies all constraints involving the so far assigned variables.
+   *
+   * @param sol Intermediate solution to be validated.
+   * @param csp The problem to the given solution.
+   * @return True if the assigned variables are a valid intermediate solution.
+   */
+  def validIntermediate(sol: Solution, csp: CSP) =
+    sol.size < csp.vars.size && !csp.domains.exists(_.isEmpty) && checkConstraints(sol, csp)
+
+  /**
    * Validates that a solution is applicable to a given problem and that it satisfies all constraints.
    *
    * @param solution The candidate solution to be validated.
    * @param csp The problem to the given solution.
    * @return True if the solution is valid, false otherwise.
    */
-  def validate(solution: Solution, csp: CSP) =
+  def valid(solution: Solution, csp: CSP) =
     solution.size == csp.vars.size && // assignment complete?
     solution.toOrderedSeq.zip(csp.domains).forall { case (value, domain) => domain contains value } &&
     checkConstraints(solution, csp) // line above: check that all values lie within their domains
