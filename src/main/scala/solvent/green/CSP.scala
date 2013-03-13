@@ -28,7 +28,8 @@ object CSP {
     val Some((numVars, varOrder)) = Some(lines.next).map { line =>
       if (line.contains(",")) { // static order
         line.split("\\(").head.trim.toInt ->
-          StaticVarOrder(line.dropWhile(c => c != '(').tail.init.split(",\\s*").map(_.toInt))
+          StaticVarOrder(line.dropWhile(c => c != '(').tail.init.split(",\\s*")
+            .map(_.toInt).sorted.distinct)
       } else if (line.toLowerCase.contains("smallest") && line.toLowerCase.contains("domain")) {
         line.split("\\(").head.trim.toInt -> SmallestDomainVarOrder
       } else {
